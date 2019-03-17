@@ -30,7 +30,7 @@ https://www.boost.org/doc/libs/1_62_0/more/getting_started/unix-variants.html,
 https://blog.koalatea.io/2018/01/03/getting-started-with-boost-on-mac-osx/
 
 ## Running
-Before running the program, you need to set the paprameters of the input network in 
+Before running the program, you need to set the parameters of the input network in 
 <code>GND.cpp</code> (line 37-41) and <code>reinsertion.cpp</code> (line 70-74), respectively. 
 
 Here is an example of a criminal network with 754 nodes obtained by the projection of a bipartite network of
