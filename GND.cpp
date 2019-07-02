@@ -173,14 +173,13 @@ vector<int> get_gcc(vector<vector<int>*>* adj) {
 // return eigenvector
 vector<double> power_iteration(vector<vector<int>*>* adj)
 {
-	std::default_random_engine generator;
+	std::mt19937 generator;
 	std::uniform_real_distribution<double> distribution(-1.0, 1.0);
 
 	vector<double> x(int(adj->size()));
 	vector<double> y(int(adj->size()));
 	int n = int(adj->size());
 
-	srand(time(NULL));
 	for (int i = 0; i < n; ++i) {
 		x.at(i) = distribution(generator);
 		y.at(i) = distribution(generator);
@@ -205,7 +204,7 @@ vector<double> power_iteration(vector<vector<int>*>* adj)
 
 // return eigenvector B = WA+AW-A
 vector<double> power_iterationB(vector<vector<int>*>* adj) {
-	std::default_random_engine generator;
+	std::mt19937 generator;
 	std::uniform_real_distribution<double> distribution(-1.0, 1.0);
 
 	vector<double> x(adj->size());
@@ -213,7 +212,6 @@ vector<double> power_iterationB(vector<vector<int>*>* adj) {
 	vector<int> db(adj->size());
 	int n = int(adj->size());
 
-	srand(int(time(NULL)));
 	for (int i = 0; i < n; ++i) {
 		x.at(i) = distribution(generator);
 		y.at(i) = distribution(generator);
