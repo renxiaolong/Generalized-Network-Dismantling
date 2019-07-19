@@ -28,6 +28,17 @@ Please note that **all the results in the paper were produced with the Visual St
 
 In the meantime we also provide the method that can run in the GNU environment. Please see the details below.
 
+### Release note
+
+(python version will be ready soon)
+
+#### Version v1.1
+
+Add functions to generate a file that store the giant connected component (GCC) change with the removal of nodes from the network. 
+
+#### Version v1.0
+
+The original code used to produce all the results in our pnas paper
 
 ### Compilation
 
@@ -88,5 +99,4 @@ The normalization is done with the sum of the weights of all the nodes in a netw
    The degrees of nodes 81, 82 and 83 are deg(81) = 10, deg(82) = 3 and deg(83) = 3. If we first remove node 83, the associated cost is 3. But, after this step, the degree of node 81 has changed to deg(81)=9.  If in the second step, we remove node 81, the associated cost is 9, which implies that the dismantling cost of removing 83 and 81 is 3+9 = 12. Note, that this is unnormalized cost. 
 
    We have to normalize it to the maximum possible degree-based cost, which is the total number of links, which is the sum of all degrees divided by 2. 
-
 
