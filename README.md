@@ -2,7 +2,7 @@
 
 These codes implement the GND and GNDR network dismantling algorithm proposed in 
 
-Xiao-Long Ren, Niels Gleinig, Dirk Helbing, Nino Antulov-Fantulin, 2019. Generalized network dismantling. *Proceedings of the National Academy of Sciences* Apr 2019, 116 (14) 6554-6559; DOI: [10.1073/pnas.1806108116](https://doi.org/10.1073/pnas.1806108116)
+Xiao-Long Ren, Niels Gleinig, Dirk Helbing, Nino Antulov-Fantulin, 2019. Generalized network dismantling. *Proceedings of the National Academy of Sciences*, Apr 2019, 116 (14) 6554-6559; DOI: [10.1073/pnas.1806108116](https://doi.org/10.1073/pnas.1806108116)
 [arXiv:1801.01357](https://arxiv.org/abs/1801.01357). 
 
 
@@ -24,7 +24,7 @@ Xiao-Long Ren, Niels Gleinig, Dirk Helbing, Nino Antulov-Fantulin, 2019. General
     }
 
 
-Please note that **all the results in the paper were produced with the Visual Studio 2017** (C++ Compiler version: VC++ 2017 version 15.5 v14.12 toolset, C++ standard: C++14/17). Therefore, in order to have reproducible results across different platform, one just needs to specify that "std::default_random_engine" should be "std::mt19937" in line 176 and line 208 of GND.cpp.
+Please note that **all the results in the paper were produced with the Visual Studio 2017** (C++ Compiler version: VC++ 2017 version 15.5 v14.12 toolset, C++ standard: C++14/17). Therefore, in order to have reproducible results across different platform, one just needs to specify that "std::default_random_engine" should be "std::mt19937" in line 176 and line 208 of GND.cpp (This has been done in the latest version of our code. So please run the code directly). 
 
 In the meantime we also provide the method that can run in the GNU environment. Please see the details below.
 
