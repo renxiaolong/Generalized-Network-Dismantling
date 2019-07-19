@@ -16,9 +16,9 @@
 
 
 /*
- * This code repeatedly partitions the gcc (giant connected component) of 
- * the network into two subnets by the spectcal clustering and Weighted 
- * Vertex Cover algorithms, such that the size of the gcc is smaller than 
+ * This code repeatedly partitions the gcc (giant connected component) of
+ * the network into two subnets by the spectcal clustering and Weighted
+ * Vertex Cover algorithms, such that the size of the gcc is smaller than
  * a specific value. The output is the set of nodes that should be removed.
  * */
 
@@ -36,10 +36,13 @@ using namespace std;
 
 const int NODE_NUM = 754;                // the number of nodes
 const char* FILE_NET = "CrimeNet.txt";  // input format of each line: id1 id2
-const char* FILE_ID = "NodeSet_GND_weighted_CrimeNet.txt";   // output the id of the removed nodes in order
-const int TARGET_SIZE = 0.01*NODE_NUM; // If the gcc size is smaller than TARGET_SIZE, the dismantling will stop. Default value can be 0.01*NODE_NUM  OR  1000
+const char* FILE_ID = "NodeSet_GND_weighted_CrimeNet.txt";  // output the id of the removed nodes in order
+const char* FILE_PLOT = "Plot_GND_weighted_CrimeNet.txt";   // format of each line: gcc removed_cost removed_nodes
+
 const int REMOVE_STRATEGY = 1; // 1: weighted method: powerIterationB(); vertex_cover_2() -- remove the node with smaller degree first
 							   // 3: unweighted method with one-degree in vertex cover： powerIteration; vertex_cover() -- remove the node with larger degree first
+const int PLOT_SIZE = 1; // the removal size of each line in FILE_PLOT. E.g. PLOT_SIZE=2 means each line of FILE_PLOT is the result that remove two nodes from the network
+const int TARGET_SIZE = 0.01*NODE_NUM; // If the gcc size is smaller than TARGET_SIZE, the dismantling will stop. Default value can be 0.01*NODE_NUM  OR  1000
 
 // read the links of the network, return A
 void rdata(vector<vector<int>*>* A) {
@@ -125,11 +128,11 @@ vector<int> get_gcc(vector<vector<int>*>* adj) {
 	int id_now = 0;
 	for (int i = 0; i < n; i++) // wide-first search, assign each connected cluster an id
 	{
-		if (id[i] == 0 && adj->at(i)->size()>0) { // this node does not belong to any cluster yet && this node is not isolated
+		if (id[i] == 0 && adj->at(i)->size() > 0) { // this node does not belong to any cluster yet && this node is not isolated
 			set<int> set_nodes;
 			set_nodes.insert(i + 1);
 			id_now++;
-			while (set_nodes.size()>0)
+			while (set_nodes.size() > 0)
 			{
 				int node_now = *(--set_nodes.end());
 				id[node_now - 1] = id_now;
@@ -231,7 +234,7 @@ vector<double> power_iterationB(vector<vector<int>*>* adj) {
 			dmax2 = db.at(i);
 		}
 	}
-	dmax = dmax*dmax + dmax2;
+	dmax = dmax * dmax + dmax2;
 	for (int i = 0; i < 30 * log(n)*sqrt(log(n)); ++i) { // 30*log(n)*log(n)
 		multiplyByWeightLaplacian(adj, &x, &y, &db, dmax);
 		multiplyByWeightLaplacian(adj, &y, &x, &db, dmax);
@@ -361,7 +364,13 @@ vector<int> vertex_cover_2(vector<vector<int>*>* A_cover, vector<vector<int>*>* 
 }
 
 // Remove nodes from the network A_new according to flag. The removed nodes will be store in nodes_id
-void remove_nodes(vector<vector<int>*>* A_new, vector<int> flag, vector<int>* nodes_id) {
+void remove_nodes(vector<vector<int>*>* A_new, vector<int> flag, vector<double>* y_gcc, vector<double>* x_links, vector<double>* x_nodes, vector<int>* nodes_id) {
+	int removed_nodes = 0, removed_links = 0;
+	if (y_gcc->size() != 0) {
+		removed_nodes = x_nodes->back();
+		removed_links = x_links->back();
+	}
+	
 	bool flag_size = false; // continue to remove?
 	int target = 0;
 	for (int k = 0; k<int(flag.size()); k++) {
@@ -391,6 +400,8 @@ void remove_nodes(vector<vector<int>*>* A_new, vector<int> flag, vector<int>* no
 		vector<int> transfer = get_gcc(A_new);
 		if (flag[i] > 0 && transfer[i] != 0) {  // remove one node if the node in the remove list && the node in the gcc
 			nodes_id->push_back(i + 1);
+			removed_nodes++;
+			removed_links += int(A_new->at(i)->size());
 			A_new->at(i)->clear();
 
 			for (int j = 0; j < int(A_new->size()); j++) {
@@ -401,6 +412,22 @@ void remove_nodes(vector<vector<int>*>* A_new, vector<int> flag, vector<int>* no
 					}
 					else it++;
 				}
+			}
+			if (removed_nodes % PLOT_SIZE == 0) { // record
+				vector<int> transfer = get_gcc(A_new); // transfer has the same size with A_new
+				int gcc_size = 0;
+				for (int i = 0; i < int(A_new->size()); i++)
+					if (transfer[i] != 0)
+						gcc_size++;
+
+				int temp = 0;
+				for (int k = 0; k<int(A_new->size()); k++) {
+					if (A_new->at(k)->size() != 0) temp++;
+				}
+				
+				y_gcc->push_back(gcc_size);
+				x_links->push_back(removed_links);
+				x_nodes->push_back(removed_nodes);
 			}
 		}
 		flag[target] = 0;
@@ -419,6 +446,11 @@ void remove_nodes(vector<vector<int>*>* A_new, vector<int> flag, vector<int>* no
 			for (int i = 0; i < int(A_new->size()); i++)
 				if (transfer[i] != 0)
 					gcc_size++;
+			if (PLOT_SIZE != 1) {
+				y_gcc->push_back(gcc_size);
+				x_links->push_back(removed_links);
+				x_nodes->push_back(removed_nodes);
+			}
 
 			std::cout << "gcc size after this round's partition - " << gcc_size << "\n";
 		}
@@ -426,14 +458,19 @@ void remove_nodes(vector<vector<int>*>* A_new, vector<int> flag, vector<int>* no
 }
 
 // Output the list of nodes that should be removed in order
-void write(vector<int>* nodes_id) {
-	ofstream wt_file(FILE_ID);
-	if (!wt_file) std::cout << "error creating file...\n";
+void write(vector<double>* y_gcc, vector<double>* x_links, vector<double>* x_nodes, vector<int>* nodes_id) {
+	ofstream wt_id(FILE_ID), wt_plot(FILE_PLOT);
+	if (!wt_id || !wt_plot) std::cout << "error creating file...\n";
 
 	for (int i = 0; i<int(nodes_id->size()); i++)
-		wt_file << nodes_id->at(i) << endl;
-		// wt_file << "S " << nodes_id->at(i) << endl;	
-	wt_file.close();
+		wt_id << nodes_id->at(i) << endl;
+	wt_id.close();
+
+	cout << "\n plot file format: gcc removed_cost removed_nodes\n";
+	wt_plot << 1 << " " << 0 << " " << 0 << endl;
+	for (int i = 0; i<int(y_gcc->size()); i++)
+		wt_plot << y_gcc->at(i) << " " << x_links->at(i) << " " << x_nodes->at(i) << "\n";
+	wt_plot.close();
 }
 
 void release_memory(vector<vector<int>*>* adj) {
@@ -472,6 +509,9 @@ int main()
 
 
 	//**** partation the network to subnets ****
+	vector<double>*	y_gcc = new vector<double>();
+	vector<double>* x_links = new vector<double>();
+	vector<double>* x_nodes = new vector<double>();
 	vector<int>* nodes_id = new vector<int>(); // store the nodes that should be removed
 	int gcc_size = int(A->size());
 	while (gcc_size > TARGET_SIZE)
@@ -543,7 +583,7 @@ int main()
 			if (flag[i] != 0)
 				flag_orginal[transfer_back[i] - 1] = flag[i];
 
-		remove_nodes(A_new, flag_orginal, nodes_id);
+		remove_nodes(A_new, flag_orginal, y_gcc, x_links, x_nodes, nodes_id);
 
 		transfer = get_gcc(A_new);
 		gcc_size = 0;
@@ -552,13 +592,19 @@ int main()
 				gcc_size++;
 	}
 
-	write(nodes_id); // output the nodes that should be removed
+	for (int i = 0; i<int(y_gcc->size()); i++) {
+		y_gcc->at(i) = y_gcc->at(i) / node_size;
+		x_nodes->at(i) = x_nodes->at(i) / node_size;
+		x_links->at(i) = x_links->at(i) / link_size;
+	}
+
+	write(y_gcc, x_links, x_nodes, nodes_id); // output the list of nodes that should be removed
 
 	release_memory(A);
 	A->clear();
 
 	release_memory(A_new);
 	A_new->clear();
-
+	
 	return 0;
 }
