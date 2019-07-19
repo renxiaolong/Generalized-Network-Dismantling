@@ -81,7 +81,9 @@ The normalization is done with the sum of the weights of all the nodes in a netw
 
 3. In a degree-based cost scenario, in the paper, we wrote that the removal cost is proportional to the degree. But one should be careful when the algorithm is recursively applied, the degrees of nodes are changing. 
 
-   Let us explain this on toy example Fig. S2 from [Supplementary Information](https://www.pnas.org/content/116/14/6554). 
+   Let us explain this on toy example Fig. S2 from [Supplementary Information](https://www.pnas.org/content/116/14/6554) of our paper. 
+   
+   ![Fig. S2](Datasets_SI/pic/FigS2.png?raw=true "Title")
 
    The degrees of nodes 81, 82 and 83 are deg(81) = 10, deg(82) = 3 and deg(83) = 3. If we first remove node 83, the associated cost is 3. But, after this step, the degree of node 81 has changed to deg(81)=9.  If in the second step, we remove node 81, the associated cost is 9, which implies that the dismantling cost of removing 83 and 81 is 3+9 = 12. Note, that this is unnormalized cost. 
 
