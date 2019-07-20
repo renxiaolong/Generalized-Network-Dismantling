@@ -32,13 +32,13 @@ In the meantime we also provide the method that can run in the GNU environment. 
 
 (python version will be ready soon)
 
-#### Version v1.1
+#### Major change after last release
 
-Add functions to generate a file that store the giant connected component (GCC) change with the removal of nodes from the network. 
+- Add functions to generate a file that store the giant connected component (GCC) change with the removal of nodes from the network. 
 
 #### Version v1.0
 
-The original code used to produce all the results in our pnas paper
+- The original code that used to produce all the results in our pnas paper
 
 ### Compilation
 
